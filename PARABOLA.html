@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PARABOLAB: Media Pembelajaran Interaktif Fungsi Kuadrat SMP Kelas 9</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent-orange: #f97316;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1.2fr 0.8fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-color);
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-width: 600px;
+            aspect-ratio: 1 / 1;
+        }
+
+        .control-panel, .info-panel {
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slider-group {
+            margin-bottom: 18px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .slider-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Input Angka Ketik */
+        .number-input-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .number-input-container label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        input[type=number] {
+            width: 70px;
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary);
+            background-color: #eef2ff;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type=number]:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #cbd5e1;
+            outline: none;
+            accent-color: var(--primary);
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn-reset {
+            background-color: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .btn-reset:hover {
+            background-color: #cbd5e1;
+        }
+
+        .btn-game {
+            background-color: var(--accent-orange);
+            color: white;
+        }
+
+        .btn-game:hover {
+            background-color: #ea580c;
+        }
+
+        .btn-game.active {
+            background-color: var(--accent-red);
+        }
+
+        .equation-box {
+            background-color: #eef2ff;
+            border-left: 4px solid var(--primary);
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .info-item strong {
+            color: var(--text-main);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            background-color: var(--text-muted);
+        }
+
+        .badge-success { background-color: var(--accent-green); }
+        .badge-warning { background-color: var(--accent-orange); }
+        .badge-danger { background-color: var(--accent-red); }
+
+        .game-banner {
+            display: none;
+            background-color: #fef3c7;
+            border: 1px solid #fde047;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #78350f;
+        }
+
+        .game-banner.active {
+            display: block;
+        }
+
+        .game-status {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Media Pembelajaran Fungsi Kuadrat</h1>
+        <p>Eksplorasi Grafik Fungsi Kuadrat y = ax² + bx + c secara Interaktif</p>
+    </header>
+
+    <div class="dashboard">
+        <!-- Kolom Kiri: Visualisasi Canvas -->
+        <div class="card">
+            <div class="canvas-container">
+                <canvas id="graphCanvas" width="600" height="600"></canvas>
+            </div>
+        </div>
+
+        <!-- Kolom Kanan: Kontrol & Informasi -->
+        <div>
+            <!-- Banner Mode Game -->
+            <div id="gameBanner" class="game-banner">
+                <strong>🎯 Tantangan "Tembak Target":</strong>
+                <p>Ubah nilai <em>a</em>, <em>b</em>, dan <em>c</em> agar grafik parabola tepat melewati titik Bintang Merah!</p>
+                <div id="gameStatus" class="game-status">Target Belum Tercapai</div>
+            </div>
+
+            <!-- Panel Kontrol -->
+            <div class="card control-panel">
+                <div class="panel-title">
+                    <span>Panel Kontrol Parameter</span>
+                </div>
+                
+                <!-- Group A -->
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="slider-label">Nilai a (Arah & Kelebaran)</span>
+                        <div class="number-input-container">
+                            <label for="numA">a =</label>
+                            <input type="number" id="numA" min="-5" max="5" step="0.1" value="1">
+                        </div>
+                    </div>
+                    <input type="range" id="sliderA" min="-5" max="5" step="0.1" value="1">
+                </div>
+
+                <!-- Group B -->
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="slider-label">Nilai b (Posisi Sumbu Simetri)</span>
+                        <div class="number-input-container">
+                            <label for="numB">b =</label>
+                            <input type="number" id="numB" min="-10" max="10" step="0.5" value="0">
+                        </div>
+                    </div>
+                    <input type="range" id="sliderB" min="-10" max="10" step="0.5" value="0">
+                </div>
+
+                <!-- Group C -->
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="slider-label">Nilai c (Titik Potong Sumbu-Y)</span>
+                        <div class="number-input-container">
+                            <label for="numC">c =</label>
+                            <input type="number" id="numC" min="-10" max="10" step="0.5" value="0">
+                        </div>
+                    </div>
+                    <input type="range" id="sliderC" min="-10" max="10" step="0.5" value="0">
+                </div>
+
+                <div class="btn-container">
+                    <button class="btn-reset" id="btnReset">Reset Nilai</button>
+                    <button class="btn-game" id="btnGame">Mode Tantangan: OFF</button>
+                </div>
+            </div>
+
+            <!-- Panel Informasi -->
+            <div class="card info-panel">
+                <div class="panel-title">Analisis Karakteristik</div>
+                
+                <div class="equation-box" id="eqDisplay">
+                    y = x²
+                </div>
+
+                <div class="info-item">
+                    <strong>Bentuk Parabola:</strong> <span id="infoShape">-</span>
+                </div>
+                <div class="info-item">
+                    <strong>Diskriminan (D = b² - 4ac):</strong> <span id="infoD">-</span>
+                    <div><span id="badgeD" class="badge"></span></div>
+                </div>
+                <div class="info-item">
+                    <strong>Sumbu Simetri (x = -b / 2a):</strong> <span id="infoAxis">-</span>
+                </div>
+                <div class="info-item">
+                    <strong>Titik Puncak/Balik P(x, y):</strong> <span id="infoVertex">-</span>
+                </div>
+                <div class="info-item">
+                    <strong>Titik Potong Sumbu-Y:</strong> <span id="infoInterceptY">(0, 0)</span>
+                </div>
+                <div class="info-item">
+                    <strong>Titik Potong Sumbu-X:</strong> <span id="infoInterceptX">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inisialisasi Element DOM
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Elements Slider
+        const sliderA = document.getElementById('sliderA');
+        const sliderB = document.getElementById('sliderB');
+        const sliderC = document.getElementById('sliderC');
+
+        // Elements Input Number
+        const numA = document.getElementById('numA');
+        const numB = document.getElementById('numB');
+        const numC = document.getElementById('numC');
+
+        const btnReset = document.getElementById('btnReset');
+        const btnGame = document.getElementById('btnGame');
+        const gameBanner = document.getElementById('gameBanner');
+        const gameStatus = document.getElementById('gameStatus');
+
+        const eqDisplay = document.getElementById('eqDisplay');
+        const infoShape = document.getElementById('infoShape');
+        const infoD = document.getElementById('infoD');
+        const badgeD = document.getElementById('badgeD');
+        const infoAxis = document.getElementById('infoAxis');
+        const infoVertex = document.getElementById('infoVertex');
+        const infoInterceptY = document.getElementById('infoInterceptY');
+        const infoInterceptX = document.getElementById('infoInterceptX');
+
+        // Pengaturan Sistem Koordinat Canvas
+        const GRID_RANGE = 10; // Rentang nilai -10 sampai 10
+        let width = canvas.width;
+        let height = canvas.height;
+        let scale = width / (GRID_RANGE * 2); // piksel per unit matematika
+        let originX = width / 2;
+        let originY = height / 2;
+
+        // State Mode Game
+        let isGameMode = false;
+        let targetPoint = { x: 0, y: 0 };
+
+        // Konversi Koordinat Matematika ke Koordinat Canvas (Piksel)
+        function toCanvasX(x) {
+            return originX + x * scale;
+        }
+
+        function toCanvasY(y) {
+            return originY - y * scale;
+        }
+
+        // Jalankan Update Visualisasi
+        function update() {
+            let a = parseFloat(sliderA.value);
+            let b = parseFloat(sliderB.value);
+            let c = parseFloat(sliderC.value);
+
+            // Perbarui nilai di Input Number agar sinkron
+            numA.value = a;
+            numB.value = b;
+            numC.value = c;
+
+            // Render komponen
+            drawGrid();
+            drawParabola(a, b, c);
+            
+            if (isGameMode) {
+                drawTarget();
+                checkHit(a, b, c);
+            }
+
+            updateInfo(a, b, c);
+        }
+
+        // Sinkronisasi dari Input Number ke Slider
+        function syncFromInput() {
+            let a = parseFloat(numA.value);
+            let b = parseFloat(numB.value);
+            let c = parseFloat(numC.value);
+
+            // Validasi jika input kosong / invalid
+            if (isNaN(a)) a = 1;
+            if (isNaN(b)) b = 0;
+            if (isNaN(c)) c = 0;
+
+            // Batasi nilai a tidak boleh 0 agar tetap menjadi Fungsi Kuadrat
+            if (a === 0) a = 0.1;
+
+            // Terapkan batas min/max
+            a = Math.max(-5, Math.min(5, a));
+            b = Math.max(-10, Math.min(10, b));
+            c = Math.max(-10, Math.min(10, c));
+
+            // Perbarui slider
+            sliderA.value = a;
+            sliderB.value = b;
+            sliderC.value = c;
+
+            update();
+        }
+
+        // Gambar Grid & Sumbu Kartesius
+        function drawGrid() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Garis-garis Grid
+            ctx.strokeStyle = '#f1f5f9';
+            ctx.lineWidth = 1;
+
+            for (let i = -GRID_RANGE; i <= GRID_RANGE; i++) {
+                // Garis vertikal
+                ctx.beginPath();
+                ctx.moveTo(toCanvasX(i), 0);
+                ctx.lineTo(toCanvasX(i), height);
+                ctx.stroke();
+
+                // Garis horizontal
+                ctx.beginPath();
+                ctx.moveTo(0, toCanvasY(i));
+                ctx.lineTo(width, toCanvasY(i));
+                ctx.stroke();
+            }
+
+            // Sumbu Utama (X dan Y)
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+
+            // Sumbu X
+            ctx.beginPath();
+            ctx.moveTo(0, originY);
+            ctx.lineTo(width, originY);
+            ctx.stroke();
+
+            // Sumbu Y
+            ctx.beginPath();
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, height);
+            ctx.stroke();
+
+            // Angka Skala Grid
+            ctx.fillStyle = '#64748b';
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+
+            for (let i = -GRID_RANGE; i <= GRID_RANGE; i++) {
+                if (i !== 0 && i % 2 === 0) {
+                    // Label Sumbu X
+                    ctx.fillText(i.toString(), toCanvasX(i), originY + 5);
+                    // Label Sumbu Y
+                    ctx.textAlign = 'right';
+                    ctx.fillText(i.toString(), originX - 5, toCanvasY(i) - 5);
+                    ctx.textAlign = 'center';
+                }
+            }
+        }
+
+        // Gambar Grafik Parabola & Marker Titik Penting
+        function drawParabola(a, b, c) {
+            ctx.beginPath();
+            ctx.strokeStyle = '#4f46e5';
+            ctx.lineWidth = 3;
+
+            let firstPoint = true;
+            for (let px = 0; px <= width; px += 2) {
+                let x = (px - originX) / scale;
+                let y = a * x * x + b * x + c;
+                let py = toCanvasY(y);
+
+                if (firstPoint) {
+                    ctx.moveTo(px, py);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            // Hitung Titik Puncak (Vertex)
+            let xv = -b / (2 * a);
+            let yv = a * xv * xv + b * xv + c;
+
+            // Gambar Titik Puncak P(x, y)
+            drawMarker(xv, yv, '#ef4444', `P(${xv.toFixed(1)}, ${yv.toFixed(1)})`);
+
+            // Gambar Titik Potong Sumbu-Y (0, c)
+            drawMarker(0, c, '#f97316', `(0, ${c.toFixed(1)})`);
+
+            // Gambar Titik Potong Sumbu-X (Akar-akar) jika D >= 0
+            let D = b * b - 4 * a * c;
+            if (D >= 0) {
+                let x1 = (-b + Math.sqrt(D)) / (2 * a);
+                let x2 = (-b - Math.sqrt(D)) / (2 * a);
+
+                drawMarker(x1, 0, '#10b981', `(${x1.toFixed(1)}, 0)`);
+                if (D > 0) {
+                    drawMarker(x2, 0, '#10b981', `(${x2.toFixed(1)}, 0)`);
+                }
+            }
+        }
+
+        // Gambar Marker Titik dan Label
+        function drawMarker(x, y, color, label) {
+            let cx = toCanvasX(x);
+            let cy = toCanvasY(y);
+
+            // Batasi agar marker hanya digambar jika berada di dalam tampilan canvas
+            if (cx < 0 || cx > width || cy < 0 || cy > height) return;
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, 6, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Teks Label Titik
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(label, cx + 8, cy - 8);
+        }
+
+        // Gambar Titik Target Tantangan Game
+        function drawTarget() {
+            let cx = toCanvasX(targetPoint.x);
+            let cy = toCanvasY(targetPoint.y);
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, 10, 0, 2 * Math.PI);
+            ctx.fillStyle = '#ef4444';
+            ctx.fill();
+            ctx.strokeStyle = '#fef08a';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Gambar Simbol Bintang di Tengah Target
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('★', cx, cy);
+        }
+
+        // Cek Apakah Kurva Membentur Target
+        function checkHit(a, b, c) {
+            let expectedY = a * targetPoint.x * targetPoint.x + b * targetPoint.x + c;
+            let diff = Math.abs(expectedY - targetPoint.y);
+
+            if (diff < 0.3) {
+                gameStatus.textContent = "🎉 BERHASIL! Kurva Tepat Mengenai Target!";
+                gameStatus.style.color = "#10b981";
+            } else {
+                gameStatus.textContent = "❌ Belum Mengenai Target. Ayo Sesuaikan Nilai!";
+                gameStatus.style.color = "#ef4444";
+            }
+        }
+
+        // Perbarui Teks Informasi Matematika
+        function updateInfo(a, b, c) {
+            // Format Tampilan Persamaan Kuadrat
+            let strA = a === 1 ? 'x²' : (a === -1 ? '-x²' : `${a}x²`);
+            let strB = '';
+            if (b > 0) strB = ` + ${b}x`;
+            else if (b < 0) strB = ` - ${Math.abs(b)}x`;
+
+            let strC = '';
+            if (c > 0) strC = ` + ${c}`;
+            else if (c < 0) strC = ` - ${Math.abs(c)}`;
+
+            eqDisplay.innerHTML = `y = ${strA}${strB}${strC}`;
+
+            // Arah Terbuka Parabola
+            if (a > 0) {
+                infoShape.textContent = "Terbuka ke ATAS (Memiliki Nilai Minimum)";
+            } else {
+                infoShape.textContent = "Terbuka ke BAWAH (Memiliki Nilai Maksimum)";
+            }
+
+            // Perhitungan Diskriminan
+            let D = b * b - 4 * a * c;
+            infoD.textContent = `${D.toFixed(2)}`;
+
+            if (D > 0) {
+                badgeD.textContent = "D > 0: Memotong Sumbu-X di 2 Titik";
+                badgeD.className = "badge badge-success";
+            } else if (D === 0) {
+                badgeD.textContent = "D = 0: Menyinggung Sumbu-X di 1 Titik";
+                badgeD.className = "badge badge-warning";
+            } else {
+                badgeD.textContent = "D < 0: Tidak Memotong Sumbu-X";
+                badgeD.className = "badge badge-danger";
+            }
+
+            // Sumbu Simetri & Titik Puncak
+            let xv = -b / (2 * a);
+            let yv = a * xv * xv + b * xv + c;
+
+            infoAxis.textContent = `x = ${xv.toFixed(2)}`;
+            infoVertex.textContent = `P(${xv.toFixed(2)}, ${yv.toFixed(2)})`;
+            infoInterceptY.textContent = `(0, ${c})`;
+
+            // Titik Potong Sumbu-X
+            if (D > 0) {
+                let x1 = (-b + Math.sqrt(D)) / (2 * a);
+                let x2 = (-b - Math.sqrt(D)) / (2 * a);
+                infoInterceptX.textContent = `(${x1.toFixed(2)}, 0) dan (${x2.toFixed(2)}, 0)`;
+            } else if (D === 0) {
+                infoInterceptX.textContent = `(${xv.toFixed(2)}, 0)`;
+            } else {
+                infoInterceptX.textContent = "Tidak Ada Titik Potong Real";
+            }
+        }
+
+        // Generator Koordinat Target Acak
+        function generateRandomTarget() {
+            let rx = (Math.floor(Math.random() * 13) - 6);
+            let ry = (Math.floor(Math.random() * 15) - 7);
+            targetPoint = { x: rx, y: ry };
+        }
+
+        // Event Listener Slider
+        sliderA.addEventListener('input', update);
+        sliderB.addEventListener('input', update);
+        sliderC.addEventListener('input', update);
+
+        // Event Listener Input Ketik
+        numA.addEventListener('input', syncFromInput);
+        numB.addEventListener('input', syncFromInput);
+        numC.addEventListener('input', syncFromInput);
+
+        // Event Reset Button
+        btnReset.addEventListener('click', () => {
+            sliderA.value = 1;
+            sliderB.value = 0;
+            sliderC.value = 0;
+            update();
+        });
+
+        // Event Game Mode Toggle
+        btnGame.addEventListener('click', () => {
+            isGameMode = !isGameMode;
+            if (isGameMode) {
+                btnGame.textContent = "Mode Tantangan: ON";
+                btnGame.classList.add('active');
+                gameBanner.classList.add('active');
+                generateRandomTarget();
+            } else {
+                btnGame.textContent = "Mode Tantangan: OFF";
+                btnGame.classList.remove('active');
+                gameBanner.classList.remove('active');
+            }
+            update();
+        });
+
+        // Jalankan Inisialisasi Pertama
+        update();
+    </script>
+</body>
+</html>
